@@ -11,3 +11,7 @@ build/
 *.dproj
 *.dproj.local
 *.skincfg
+src/TFakerTest.cfg
+*.~pas
+*.~dpr
+src/TFakerTest.dof

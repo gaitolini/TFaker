@@ -1,17 +1,6 @@
-﻿unit Faker;
+unit Faker;
 
 interface
-
-type
-  /// <summary>This Type provides fake/random data.</summary>
-  TFaker = class
-  private
-
-    class function randVal(aArray: array of String): string;
-    class function replace(aFullString, aSubString: string; aReplaceWith: string = ''): string; overload;
-    class function replace(aFullString: string; aSubStringArray: array of string; aReplaceWith: string = ''): string; overload;
-
-  public
 
     const
     /// <summary>
@@ -45,7 +34,7 @@ type
       'Marv Ellis', 'Evan Shlee', 'Terry Bull', 'Mort Ission', 'Mark Ette', 'Ken Tucky', 'Louis Ville', 'Colin Oscopy', 'Fred Attchini',
       'Al Fredo', 'Penny Tration', 'Reed Iculous', 'Chip Zinsalsa', 'Matt Uhrafact', 'Jack Dup', 'Mike Roscope', 'Lou Sinclark',
       'Faye Daway', 'Javy Cado', 'Tom Ollie', 'Sam Buca', 'Phil Anderer', 'Sam Owen', 'Mary Achi', 'Ray Cyst', 'Curtis E. Flush',
-      'Holland Oats', 'Helen Highwater', 'Eddy Kitt', 'Al Toesacks', 'Sir Kim Scision', 'Elle Bowdrop', 'Yu Tube', 'Ellis Dee',
+      'Holland Oats', 'Helen Highwater', 'Eddy Kitt', 'Al Toesacks', 'Sir Kim Scision', 'Elle Bowdrop', 'Anderson Gaitolini', 'Ellis Dee',
       'Anna Lytics', 'Sara Bellum', 'Penny Trate', 'Phil Erup', 'Jenna Side', 'Mary Nara', 'Mick Donalds', 'Amber Alert', 'Vic Tory',
       'Bobby Pin', 'Dom Inate', 'Hugh Miliation', 'Christian Mingle', 'Juan Soponatime', 'Dante Sinferno', 'Ed Zupp', 'Sarah Yevo',
       'Jess Thetip', 'Arthur Itis', 'Faye Sbook', 'Carrie R. Pigeon', 'Rachel Slurs', 'Ty Pryder', 'Cole Slaw', 'Pat Ernity', 'Deb Utant',
@@ -194,7 +183,17 @@ type
       'powerful', 'various', 'crawl', 'lacking', 'lethal', 'baby', 'sore', 'mourn', 'behave', 'pass', 'mark', 'summer', 'cause',
       'destruction', 'stale', 'basin', 'embarrass', 'rob', 'income', 'overjoyed', 'aback', 'spark', 'air', 'worthless', 'hospitable',
       'dynamic', 'push', 'nervous', 'dark', 'chin', 'shock', 'frame', 'dojo');
+      
+type
+  /// <summary>This Type provides fake/random data.</summary>
+  TFaker = class
+  private
 
+    class function randVal(aArray: array of String): string;
+    class function replace(aFullString, aSubString: string; aReplaceWith: string = ''): string; overload;
+    class function replace(aFullString: string; aSubStringArray: array of string; aReplaceWith: string = ''): string; overload;
+
+  public
     class function firstName: string;
     class function lastName: string;
     class function fullName: string;
@@ -205,7 +204,7 @@ type
     /// <summary>
     /// Return a birth date at where age is less than or equal to 100
     /// </summary>
-    class function birthDate: TDate;
+    class function birthDate: TDateTime;
 
     class function thing: string;
 
@@ -236,17 +235,27 @@ end;
 class function TFaker.replace(aFullString: string; aSubStringArray: array of string; aReplaceWith: string): string;
 var
   s: string;
+  I: Integer;
 begin
   result := aFullString;
-  for s in aSubStringArray do
-    result := replace(result, s, aReplaceWith);
+  {$IFDEF VER150}
+   for I := 0 to Length(aSubStringArray)-1 do
+   begin
+      Result := replace(result,s, aReplaceWith);
+   end;
+
+  {$ELSE}
+    for s in aSubStringArray do
+       result := replace(result, s, aReplaceWith);
+  {$ENDIF}
+
 end;
 
 { TFaker data provider }
 
 class function TFaker.fullName: string;
 begin
-  result := randVal(TFaker.NAMES);
+  result := randVal(NAMES);
 end;
 
 class function TFaker.firstName: string;
@@ -263,13 +272,13 @@ end;
 
 class function TFaker.otan: string;
 begin
-  result := randVal(TFaker.OTAN_ALPHABET);
+  result := randVal(OTAN_ALPHABET);
 end;
 
 class function TFaker.password: string;
   function p: string;
   begin
-    result := Copy(randVal(TFaker.PASSWORDS), 0, Random(Length(TFaker.PASSWORDS)));
+    result := Copy(randVal(PASSWORDS), 0, Random(Length(PASSWORDS)));
   end;
 
 begin
@@ -277,7 +286,7 @@ begin
   result := p + p + p;
 end;
 
-class function TFaker.birthDate: TDate;
+class function TFaker.birthDate: TDateTime;
 begin
   result := EncodeDate(RandomRange(yearof(date) - 100, yearof(date)), RandomRange(1, 12), RandomRange(1, 31));
 end;
@@ -293,17 +302,17 @@ begin
   if aCustomDomain <> '' then
     result := TFaker.userName + '@' + aCustomDomain
   else
-    result := TFaker.userName + '@' + randVal(TFaker.EMAIL_DOMAINS);
+    result := TFaker.userName + '@' + randVal(EMAIL_DOMAINS);
 end;
 
 class function TFaker.thing: string;
 begin
-  result := randVal(TFaker.THINGS);
+  result := randVal(THINGS);
 end;
 
 class function TFaker.word: string;
 begin
-  result := randVal(TFaker.WORDS);
+  result := randVal(WORDS);
 end;
 
 class function TFaker.text(wordsNumber: Integer): string;
@@ -314,11 +323,11 @@ begin
   countWords := wordsNumber;
 
   if countWords = 0 then
-    countWords := RandomRange(1, Length(TFaker.WORDS));
+    countWords := RandomRange(1, Length(WORDS));
 
   _words := TStringList.Create;
   while _words.Count <> countWords do
-    _words.Add(randVal(TFaker.WORDS) + ' ');
+    _words.Add(randVal(WORDS) + ' ');
 
   _words.Delete(countWords - 1);
   result := _words.text;
@@ -326,7 +335,7 @@ end;
 
 class function TFaker.loremIpsum: string;
 begin
-  result := TFaker.LOREM_IPSUM;
+  result := LOREM_IPSUM;
 end;
 
 end.
